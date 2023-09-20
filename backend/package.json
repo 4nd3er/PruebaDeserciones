@@ -2,6 +2,7 @@
   "name": "backed",
   "version": "1.0.0",
   "description": "prueba Deserciones SENA",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
@@ -22,7 +23,9 @@
   },
   "homepage": "https://github.com/4nd3er/PruebaDeserciones#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
