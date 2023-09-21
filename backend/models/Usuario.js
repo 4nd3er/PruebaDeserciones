@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bycrypt from 'bcrypt';
 
 const usuarioSchema = mongoose.Schema({
     nombre: {
@@ -26,9 +27,21 @@ const usuarioSchema = mongoose.Schema({
     },
 },
     {
-        timestaps: true,
+        timestamps: true,
     }
 );
+
+usuarioSchema.pre('save', async (next) => {
+    if (!this.isModified("password")) {
+        next();
+    }
+    const salt = await bycrypt.genSalt(10);
+    this.password = bycrypt.hash(this.password, salt);
+}) // .pre hace que la funcion se ejecute antes de que se registre un usuario
+
+usuarioSchema.methods.comprobarPassword = async (passwordFormulario) => {
+    return await bycrypt.compare(passwordFormulario, this.password)
+}
 
 const Usuario = mongoose.model("Usuario", usuarioSchema);
 
