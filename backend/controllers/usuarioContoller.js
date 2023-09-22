@@ -2,7 +2,7 @@ import Usuario from "../models/Usuario.js";
 import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
 
-const registar = async (req, res) => {
+export const registar = async (req, res) => {
 
     // Evitar registros duplicados
     const { email } = req.body; // consigue el email del request que llega
@@ -16,14 +16,14 @@ const registar = async (req, res) => {
     try {
         const usuario = new Usuario(req.body); // hace una copia del modelo y asignandole los parametros
         usuario.token = generarId(); // Genera un token para el usuario
-        await usuario.save(); // Guarda el usuario en la base de datos
-        res.json({ usuario }); // retorna el usuario registrado
+        // TODO await usuario.save(); // Guarda el usuario en la base de datos
+        res.json(usuario); // retorna el usuario registrado
     } catch (error) {
         console.log(error);
     }
 }
 
-const auntenticar = async (req, res) => {
+export const auntenticar = async (req, res) => {
     const { email, password } = req.body;
 
     // Comprobar si el usuario existe
@@ -53,7 +53,7 @@ const auntenticar = async (req, res) => {
     }
 }
 
-const confirmar = async (req, res) => {
+export const confirmar = async (req, res) => {
     const { token } = req.params;
     const usuarioConfirmar = await Usuario.findOne({ token });
     if (!usuarioConfirmar) {
@@ -63,7 +63,7 @@ const confirmar = async (req, res) => {
     try {
         usuarioConfirmar.confirmado = true;
         usuarioConfirmar.token = '';
-        await usuarioConfirmar.save();
+        // TODO await usuarioConfirmar.save();
         // Confirma el usuario
         res.json({ msg: 'Usuario confirmado' });
     } catch (error) {
@@ -71,4 +71,60 @@ const confirmar = async (req, res) => {
     }
 }
 
-export { registar, auntenticar, confirmar };
+export const olvidePassword = async (req, res) => {
+    const { email } = req.body;
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+        const error = new Error('El usuario no existe');
+        res.status(404).json({ msg: error.message })
+    }
+
+    try {
+        usuario.token = generarId();
+        // TODO await usuario.save();
+        res.json({ msg: 'Hemos enviado un email con las instrucciones' });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const comprobarToken = async (req, res) => {
+    const { token } = req.params;
+    const tokenValido = await Usuario.findOne({ token });
+    if (!tokenValido) {
+        const error = new Error('Token no valido');
+        res.status(403).json({ msg: error.message });
+    } // Si el token obtenido no pertenece a alguien retorna un error
+    else {
+        res.json({ msg: 'Token valido y el usuario existe' });
+    }
+};
+
+export const nuevoPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const usuario = await Usuario.findOne({ token });
+    if (!usuario) {
+        const error = new Error('Token no valido');
+        res.status(403).json({ msg: error.message });
+    } // Si el token obtenido no pertenece a alguien retorna un error
+    else {
+        usuario.password = password;
+        usuario.token = '';
+        try {
+            // TODO await usuario.save();
+            res.json({ msg: 'Password actualizada' });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+};
+
+export const perfil = async (req, res) => {
+    const {usuario } = req;
+    res.json(usuario);
+};
+
+// export { registar, auntenticar, confirmar, olvidePassword, comprobarToken };
+// ? Se puede tambien exportar cuando se crea la funcion
