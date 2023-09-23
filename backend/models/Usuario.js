@@ -31,7 +31,7 @@ const usuarioSchema = mongoose.Schema({
     }
 );
 
-usuarioSchema.pre('save', async (next) => {
+usuarioSchema.pre('save', async function(next) {
     if (!this.isModified("password")) {
         next();
     }
@@ -39,7 +39,7 @@ usuarioSchema.pre('save', async (next) => {
     this.password = bycrypt.hash(this.password, salt);
 }) // .pre hace que la funcion se ejecute antes de que se registre un usuario
 
-usuarioSchema.methods.comprobarPassword = async (passwordFormulario) => {
+usuarioSchema.methods.comprobarPassword = async function(passwordFormulario) {
     return await bycrypt.compare(passwordFormulario, this.password)
 }
 

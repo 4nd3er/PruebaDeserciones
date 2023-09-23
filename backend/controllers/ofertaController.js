@@ -49,7 +49,7 @@ export const editarOferta = async (req, res) => {
     oferta.cursos = req.body.cursos || oferta.cursos;
 
     try {
-        // TODO await oferta.save();
+        await oferta.save();
         res.json(oferta);
     } catch (error) {
         console.log(error);
@@ -67,7 +67,7 @@ export const eliminarOferta = async (req, res) => {
 
     try {
         oferta.estado = false;
-        // TODO oferta.save();
+        oferta.save();
         res.json('Oferta archivada');
     } catch (error) {
         console.log(error);

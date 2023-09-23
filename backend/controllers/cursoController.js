@@ -10,7 +10,7 @@ export const nuevoCurso = async (req, res) => {
     curso.creador = req.usuario._id;
 
     try {
-        // TODO await curso.save();
+         await curso.save();
         res.json(curso);
     } catch (error) {
         console.log(error);
@@ -45,7 +45,7 @@ export const editarCurso = async (req, res) => {
     proyecto.modalidadFormacion = req.body.modalidadFormacion || proyecto.modalidadFormacion;
 
     try {
-        // TODO await curso.save();
+         await curso.save();
         res.json(curso);
     } catch (error) {
         console.log(error);

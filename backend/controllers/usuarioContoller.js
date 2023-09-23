@@ -16,8 +16,8 @@ export const registar = async (req, res) => {
     try {
         const usuario = new Usuario(req.body); // hace una copia del modelo y asignandole los parametros
         usuario.token = generarId(); // Genera un token para el usuario
-        // TODO await usuario.save(); // Guarda el usuario en la base de datos
-        res.json(usuario); // retorna el usuario registrado
+        await usuario.save(); // Guarda el usuario en la base de datos
+        return res.json(usuario); // retorna el usuario registrado
     } catch (error) {
         console.log(error);
     }
@@ -30,13 +30,13 @@ export const auntenticar = async (req, res) => {
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
         const error = new Error('El usuario no existe');
-        res.status(404).json({ msg: error.message })
+        return res.status(404).json({ msg: error.message })
     }
 
     // Comprobar si el usuario esta confirmado
     if (!usuario.confirmado) {
         const error = new Error('El usuario no esta confirmado');
-        res.status(403).json({ msg: error.message })
+        return res.status(403).json({ msg: error.message })
     }
 
     // Comprobar su password
@@ -49,7 +49,7 @@ export const auntenticar = async (req, res) => {
         })
     } else {
         const error = new Error('La contraseña es incorrecta');
-        res.status(403).json({ msg: error.message })
+        return res.status(403).json({ msg: error.message })
     }
 }
 
@@ -58,14 +58,14 @@ export const confirmar = async (req, res) => {
     const usuarioConfirmar = await Usuario.findOne({ token });
     if (!usuarioConfirmar) {
         const error = new Error('Token no valido');
-        res.status(403).json({ msg: error.message });
+        return res.status(403).json({ msg: error.message });
     } // Si el token obtenido no pertenece a alguien retorna un error
     try {
         usuarioConfirmar.confirmado = true;
         usuarioConfirmar.token = '';
-        // TODO await usuarioConfirmar.save();
+        await usuarioConfirmar.save();
         // Confirma el usuario
-        res.json({ msg: 'Usuario confirmado' });
+        return res.json({ msg: 'Usuario confirmado' });
     } catch (error) {
         console.log(error)
     }
@@ -76,12 +76,12 @@ export const olvidePassword = async (req, res) => {
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
         const error = new Error('El usuario no existe');
-        res.status(404).json({ msg: error.message })
+        return res.status(404).json({ msg: error.message })
     }
 
     try {
         usuario.token = generarId();
-        // TODO await usuario.save();
+        await usuario.save();
         res.json({ msg: 'Hemos enviado un email con las instrucciones' });
     } catch (error) {
         console.log(error);
@@ -93,7 +93,7 @@ export const comprobarToken = async (req, res) => {
     const tokenValido = await Usuario.findOne({ token });
     if (!tokenValido) {
         const error = new Error('Token no valido');
-        res.status(403).json({ msg: error.message });
+        return res.status(403).json({ msg: error.message });
     } // Si el token obtenido no pertenece a alguien retorna un error
     else {
         res.json({ msg: 'Token valido y el usuario existe' });
@@ -107,13 +107,13 @@ export const nuevoPassword = async (req, res) => {
     const usuario = await Usuario.findOne({ token });
     if (!usuario) {
         const error = new Error('Token no valido');
-        res.status(403).json({ msg: error.message });
+        return res.status(403).json({ msg: error.message });
     } // Si el token obtenido no pertenece a alguien retorna un error
     else {
         usuario.password = password;
         usuario.token = '';
         try {
-            // TODO await usuario.save();
+            await usuario.save();
             res.json({ msg: 'Password actualizada' });
         } catch (error) {
             console.log(error);
@@ -122,7 +122,7 @@ export const nuevoPassword = async (req, res) => {
 };
 
 export const perfil = async (req, res) => {
-    const {usuario } = req;
+    const { usuario } = req;
     res.json(usuario);
 };
 
